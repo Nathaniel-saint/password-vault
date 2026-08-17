@@ -7,8 +7,8 @@ import {
   FiX,
   FiCheck,
 } from "react-icons/fi";
-import "./Notifications.css";
-import { api, useAuth } from "../context/AuthContext";
+import "../../styles/page_styles/Notifications.css";
+import { api, useAuth } from "../../context/AuthContext";
 
 function Notification() {
   const { accessToken } = useAuth();

@@ -10,8 +10,8 @@ import {
   FiLock,
   FiEdit3,
 } from "react-icons/fi";
-import "./DomainDetails.css";
-import { api } from "../context/AuthContext";
+import "../../styles/page_styles/DomainDetails.css";
+import { api } from "../../context/AuthContext";
 
 function DomainDetails({ isOpen, onClose, domain }) {
   const [credentials, setCredentials] = useState(null);

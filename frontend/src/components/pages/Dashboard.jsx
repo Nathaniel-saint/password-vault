@@ -9,10 +9,10 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import "./Dashboard.css";
+import "../../styles/page_styles/Dashboard.css";
 import AddDomain from "./AddDomain";
 import DomainDetails from "./DomainDetails";
-import { api, useAuth } from "../context/AuthContext";
+import { api, useAuth } from "../../context/AuthContext";
 
 function Dashboard() {
   const { accessToken } = useAuth();

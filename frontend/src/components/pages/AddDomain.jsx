@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FiX } from "react-icons/fi";
-import "./AddDomain.css";
-import { api } from "../context/AuthContext";
+import "../../styles/page_styles/AddDomain.css";
+import { api } from "../../context/AuthContext";
 
 function AddDomain({ isOpen, onClose, onAddDomain }) {
   const [formData, setFormData] = useState({

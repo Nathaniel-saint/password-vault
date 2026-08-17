@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, useAuth } from "../context/AuthContext";
-import "./SignIn.css";
+import { api, useAuth } from "../../context/AuthContext";
+import "../../styles/auth_styles/SignIn.css";
 
 function SignIn() {
   const [form, setForm] = useState({ email: "", password: "" });

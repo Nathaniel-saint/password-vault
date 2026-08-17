@@ -3,8 +3,8 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
-import "./DashLayout.css";
-import { useAuth } from "../context/AuthContext";
+import "../../styles/page_styles/DashLayout.css";
+import { useAuth } from "../../context/AuthContext";
 
 function DashLayout() {
   const { logout } = useAuth();

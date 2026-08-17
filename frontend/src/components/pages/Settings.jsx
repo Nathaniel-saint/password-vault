@@ -1,14 +1,21 @@
-import React, { useState } from 'react'
-import { FiUser, FiLock, FiCreditCard, FiSliders, FiUpload, FiTrash2 } from 'react-icons/fi'
-import './Settings.css'
+import React, { useState } from "react";
+import {
+  FiUser,
+  FiLock,
+  FiCreditCard,
+  FiSliders,
+  FiUpload,
+  FiTrash2,
+} from "react-icons/fi";
+import "../../styles/page_styles/Settings.css";
 
 function Setting() {
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab, setActiveTab] = useState("profile");
   const [profile, setProfile] = useState({
-    fullName: 'Alex Johnson',
-    email: 'alex.j@example.com',
-    organization: 'Acme Corp'
-  })
+    fullName: "Alex Johnson",
+    email: "alex.j@example.com",
+    organization: "Acme Corp",
+  });
 
   return (
     <div className="settings-container">
@@ -18,85 +25,103 @@ function Setting() {
       </header>
 
       <div className="settings-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
+        <button
+          className={`tab-btn ${activeTab === "profile" ? "active" : ""}`}
+          onClick={() => setActiveTab("profile")}
         >
           <FiUser /> Profile Details
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`}
-          onClick={() => setActiveTab('security')}
+        <button
+          className={`tab-btn ${activeTab === "security" ? "active" : ""}`}
+          onClick={() => setActiveTab("security")}
         >
           <FiLock /> Security
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'billing' ? 'active' : ''}`}
-          onClick={() => setActiveTab('billing')}
+        <button
+          className={`tab-btn ${activeTab === "billing" ? "active" : ""}`}
+          onClick={() => setActiveTab("billing")}
         >
           <FiCreditCard /> Billing & Subscription
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'preferences' ? 'active' : ''}`}
-          onClick={() => setActiveTab('preferences')}
+        <button
+          className={`tab-btn ${activeTab === "preferences" ? "active" : ""}`}
+          onClick={() => setActiveTab("preferences")}
         >
           <FiSliders /> Preferences
         </button>
       </div>
 
       <div className="settings-content">
-        {activeTab === 'profile' && (
+        {activeTab === "profile" && (
           <section className="settings-panel">
             <h3>Profile Settings</h3>
-            
+
             <div className="avatar-section">
               <div className="avatar-placeholder">AJ</div>
               <div className="avatar-actions">
-                <button className="secondary-btn"><FiUpload /> Change Avatar</button>
-                <button className="danger-text-btn"><FiTrash2 /> Remove</button>
+                <button className="secondary-btn">
+                  <FiUpload /> Change Avatar
+                </button>
+                <button className="danger-text-btn">
+                  <FiTrash2 /> Remove
+                </button>
               </div>
             </div>
 
-            <form className="settings-form" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="settings-form"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <div className="form-group">
                 <label>Full Name</label>
-                <input 
-                  type="text" 
-                  value={profile.fullName} 
-                  onChange={(e) => setProfile({...profile, fullName: e.target.value})}
+                <input
+                  type="text"
+                  value={profile.fullName}
+                  onChange={(e) =>
+                    setProfile({ ...profile, fullName: e.target.value })
+                  }
                 />
               </div>
 
               <div className="form-group">
                 <label>Email Address</label>
-                <input 
-                  type="email" 
-                  value={profile.email} 
-                  onChange={(e) => setProfile({...profile, email: e.target.value})}
+                <input
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) =>
+                    setProfile({ ...profile, email: e.target.value })
+                  }
                 />
               </div>
 
               <div className="form-group">
                 <label>Organization</label>
-                <input 
-                  type="text" 
-                  value={profile.organization} 
-                  onChange={(e) => setProfile({...profile, organization: e.target.value})}
+                <input
+                  type="text"
+                  value={profile.organization}
+                  onChange={(e) =>
+                    setProfile({ ...profile, organization: e.target.value })
+                  }
                 />
               </div>
 
-              <button type="submit" className="save-btn">Save Changes</button>
+              <button type="submit" className="save-btn">
+                Save Changes
+              </button>
             </form>
           </section>
         )}
 
-        {activeTab === 'security' && (
+        {activeTab === "security" && (
           <section className="settings-panel">
             <h3>Security Settings</h3>
             <div className="security-block">
               <h4>Change Password</h4>
               <p>Update your password regularly to keep your account secure.</p>
-              <form className="settings-form" onSubmit={(e) => e.preventDefault()}>
+              <form
+                className="settings-form"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <div className="form-group">
                   <label>Current Password</label>
                   <input type="password" placeholder="••••••••" />
@@ -105,13 +130,15 @@ function Setting() {
                   <label>New Password</label>
                   <input type="password" placeholder="••••••••" />
                 </div>
-                <button type="submit" className="save-btn">Update Password</button>
+                <button type="submit" className="save-btn">
+                  Update Password
+                </button>
               </form>
             </div>
           </section>
         )}
 
-        {activeTab === 'billing' && (
+        {activeTab === "billing" && (
           <section className="settings-panel">
             <h3>Billing & Subscription</h3>
             <div className="plan-card">
@@ -125,7 +152,7 @@ function Setting() {
           </section>
         )}
 
-        {activeTab === 'preferences' && (
+        {activeTab === "preferences" && (
           <section className="settings-panel">
             <h3>Account Preferences</h3>
             <p>Notification and interface settings preferences panel.</p>
@@ -133,7 +160,7 @@ function Setting() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default Setting
+export default Setting;
