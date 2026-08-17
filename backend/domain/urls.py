@@ -4,7 +4,7 @@ from . import views
 
 router = DefaultRouter()
 
-router.register(r'doamin', views.DomainView, basename='domains')
+router.register(r'domain', views.DomainView, basename='domains')
 
 urlpatterns = [
     path('',include(router.urls)),
