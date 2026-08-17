@@ -1,0 +1,102 @@
+.form.sign-in {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 24rem;
+  font-family: "Inter", sans-serif;
+}
+
+.sigin-head-p {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.sigin-head-p h1 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.sign-in-p {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.email,
+.pass {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #252f3d;
+  margin-bottom: 0.5rem;
+}
+
+.sign-in input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 0.0625rem solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  margin-bottom: 1.25rem;
+}
+
+.sign-in input:focus {
+  border-color: #4f46e5;
+}
+
+.submit-in {
+  width: 100%;
+  background-color: #1a2e65;
+  color: #ffffff;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.submit-in:hover {
+  background-color: #133590;
+}
+
+.sign-in-p {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.form.sign-in > p a {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.error-msg-in {
+  color: red;
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.form.sign-in > p a:hover {
+  color: #3323cc;
+  text-decoration: underline;
+}
+
+@media (max-width: 48rem) {
+  .form.sign-in {
+    max-width: 100%;
+  }
+}

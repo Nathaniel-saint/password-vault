@@ -1,0 +1,123 @@
+.form-bg {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 24rem; 
+    /* gap: 0.5rem; */
+}
+
+.form-head-p {
+    margin-bottom: 2rem;
+}
+
+.form-head {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 0.25rem;
+}
+
+.form-head-p h1{
+    font-weight: 500;
+}
+
+.sign-up-p{
+    color: black;
+    font-size: 0.95rem;
+}
+
+.form-wrapper label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #252f3d;
+    margin-top: 0.5rem;
+}
+
+.form-wrapper input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 0.0625rem solid #CBD5E1;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-wrapper input:focus {
+    border-color: #3323cc;
+}
+
+.instruct {
+    font-size: 0.75rem;
+    color: #64748B;
+    margin-top: 0.125rem;
+    margin-bottom: 0.75rem;
+}
+
+.form-wrapper button{
+    width: 100%;
+    background-color: #1A2E65;
+    color: #FFFFFF;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.form-wrapper button:hover {
+    background-color: #133590;
+}
+
+
+@media (max-width: 48rem) {
+    .form-wrapper {
+        max-width: 100%;
+    }
+}
+
+.form-wrapper span {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.form-wrapper span a {
+    color: #4F46E5;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.form-wrapper span a:hover {
+    color: #3323CC;
+    text-decoration: underline;
+}
+
+.error-msg{
+    color: red;
+    font-size: 0.6rem;
+}
+
+.succ-msg{
+    color: green;
+    background-color: rgb(132, 247, 138);
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border-radius: 0.8rem;
+    border: 1px green solid;
+    justify-content: center;
+    text-align: center;
+}

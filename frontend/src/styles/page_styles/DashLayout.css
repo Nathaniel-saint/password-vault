@@ -1,0 +1,132 @@
+.dashboard {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100%;
+    background-color: #F8FAFC;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.side-links-layout {
+    width: 16rem;
+    min-width: 16rem;
+    height: 100vh;
+    position: relative;
+    background-color: #FFFFFF;
+    border-right: 0.0625rem solid #E2E8F0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    flex-shrink: 0;
+}
+
+.logo-head-dashlayout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    padding-left: 0.5rem;
+}
+
+.dash-logo {
+    height: 2rem; 
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-head-dashlayout span {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0F172A;
+    line-height: 1; 
+    letter-spacing: -0.01em;
+}
+
+.side-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.side-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.side-links a,
+.last-dash-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: #64748B;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.side-links a svg,
+.last-dash-link svg {
+    font-size: 1.25rem;
+}
+
+.side-links a:hover,
+.last-dash-link:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+.side-links a.active {
+    background-color: #EEF2FF;
+    color: #4F46E5;
+    font-weight: 600;
+}
+
+.last-dash-link {
+    color: #EF4444;
+    margin-top: auto;
+}
+
+.last-dash-link:hover {
+    background-color: #FEF2F2;
+    color: #DC2626;
+}
+
+main {
+    flex: 1;
+    height: 100vh;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+@media (max-width: 48rem) {
+    .dashboard {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .side-links-layout {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 0.0625rem solid #E2E8F0;
+        padding: 1rem;
+    }
+
+    .side-bar {
+        gap: 1rem;
+    }
+
+    main {
+        height: auto;
+        overflow-y: visible;
+    }
+}

@@ -1,0 +1,156 @@
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 56rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.settings-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0F172A;
+}
+
+/* Tab Navigation */
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 0.0625rem solid #E2E8F0;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: none;
+    background: transparent;
+    color: #64748B;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+.tab-btn.active {
+    background-color: #EEF2FF;
+    color: #1A2E65; /* Custom Navy */
+    font-weight: 600;
+}
+
+/* Panel Layout */
+.settings-panel {
+    background-color: #FFFFFF;
+    border: 0.0625rem solid #E2E8F0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-panel h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0F172A;
+}
+
+/* Avatar Section */
+.avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.avatar-placeholder {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-color: #1A2E65;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.avatar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Form Styling */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 28rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 0.0625rem solid #CBD5E1;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: #1A2E65;
+}
+
+.save-btn {
+    align-self: flex-start;
+    background-color: #1A2E65;
+    color: #FFFFFF;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.save-btn:hover {
+    background-color: #13224B;
+}
+
+.danger-text-btn {
+    background: transparent;
+    border: none;
+    color: #DC2626;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
