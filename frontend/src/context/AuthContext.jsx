@@ -10,7 +10,7 @@ import axios from "axios";
 const AuthContext = createContext();
 
 export const api = axios.create({
-  baseURL: "https://domain-guard-api.onrender.com/",
+  baseURL: "http://localhost:8000/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
           try {
             const res = await axios.post(
-              "https://domain-guard-api.onrender.com/auth/api/token/refresh/",
+              "http://localhost:8000/api/register/api/token/refresh/",
               { refresh: refreshToken },
             );
 
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
       if (refreshToken) {
         try {
           const res = await axios.post(
-            "https://domain-guard-api.onrender.com/auth/api/token/refresh/",
+            "http://localhost:8000/api/register/api/token/refresh/",
             { refresh: refreshToken },
           );
 
