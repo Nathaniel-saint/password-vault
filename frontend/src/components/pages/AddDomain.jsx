@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiX, FiEye, FiEyeOff } from "react-icons/fi";
+import toast from "react-hot-toast";
 import "../../styles/page_styles/AddDomain.css";
 import { api } from "../../context/AuthContext";
 
-function AddDomain({ isOpen, onClose, onAddDomain }) {
+function AddDomain({ isOpen, onClose, onAddDomain, domainToEdit }) {
   const [formData, setFormData] = useState({
     siteName: "",
     loginUrl: "",
@@ -13,7 +14,26 @@ function AddDomain({ isOpen, onClose, onAddDomain }) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (domainToEdit) {
+      setFormData({
+        siteName: domainToEdit.site_name || "",
+        loginUrl: domainToEdit.login_url || "",
+        siteUsernameOrEmail: domainToEdit.site_username_or_email || "",
+        sitePassword: domainToEdit.site_password || "",
+        note: domainToEdit.note || "",
+      });
+    } else {
+      setFormData({
+        siteName: "",
+        loginUrl: "",
+        siteUsernameOrEmail: "",
+        sitePassword: "",
+        note: "",
+      });
+    }
+  }, [domainToEdit, isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,52 +47,48 @@ function AddDomain({ isOpen, onClose, onAddDomain }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
-    try {
-      const payload = {
-        site_name: formData.siteName,
-        login_url: formData.loginUrl,
-        site_username_or_email: formData.siteUsernameOrEmail,
-        site_password: formData.sitePassword,
-        note: formData.note,
-      };
+    const payload = {
+      site_name: formData.siteName,
+      login_url: formData.loginUrl,
+      site_username_or_email: formData.siteUsernameOrEmail,
+      site_password: formData.sitePassword,
+      note: formData.note,
+    };
 
-      const response = await api.post("api/domain/", payload);
+    const isEdit = Boolean(domainToEdit);
+    const domainId = domainToEdit?.id || domainToEdit?.pk;
 
-      if (onAddDomain) {
-        onAddDomain(response.data);
-      }
+    const requestPromise = isEdit
+      ? api.patch(`api/domain/${domainId}/`, payload)
+      : api.post("api/domain/", payload);
 
-      setFormData({
-        siteName: "",
-        loginUrl: "",
-        siteUsernameOrEmail: "",
-        sitePassword: "",
-        note: "",
-      });
-      onClose();
-    } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-          "Failed to add credential item. Please check your details.",
-      );
-    } finally {
-      setLoading(false);
-    }
+    toast
+      .promise(requestPromise, {
+        loading: isEdit ? "Updating credential..." : "Saving credential...",
+        success: (response) => {
+          if (onAddDomain) {
+            onAddDomain(response.data);
+          }
+          onClose();
+          return isEdit ? "Credential updated!" : "Credential added!";
+        },
+        error: (err) =>
+          err.response?.data?.detail ||
+          `Failed to ${isEdit ? "update" : "add"} credential.`,
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Add New Credential</h3>
+          <h3>{domainToEdit ? "Edit Credential" : "Add New Credential"}</h3>
           <button className="close-modal-btn" onClick={onClose}>
             <FiX />
           </button>
         </div>
-
-        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
@@ -168,7 +184,11 @@ function AddDomain({ isOpen, onClose, onAddDomain }) {
               className="submit-domain-btn"
               disabled={loading}
             >
-              {loading ? "Saving..." : "Save Credential"}
+              {loading
+                ? "Saving..."
+                : domainToEdit
+                  ? "Update Credential"
+                  : "Save Credential"}
             </button>
           </div>
         </form>

@@ -15,6 +15,7 @@ import {
   FiTrash2,
   FiFileText,
 } from "react-icons/fi";
+import toast from "react-hot-toast";
 import "../../styles/page_styles/Dashboard.css";
 import AddDomain from "./AddDomain";
 import NoteModal from "./NoteModal";
@@ -87,9 +88,10 @@ function Dashboard() {
     }));
   };
 
-  const handleCopy = (text) => {
+  const handleCopy = (text, label = "Item") => {
     if (text) {
       navigator.clipboard.writeText(text);
+      toast.success(`${label} copied to clipboard!`);
     }
   };
 
@@ -119,14 +121,17 @@ function Dashboard() {
     if (!item) return;
 
     const itemId = item.id || item.pk;
-    try {
-      await api.delete(`api/domain/${itemId}/`);
-      setDeleteModalState({ isOpen: false, item: null });
-      fetchDomains();
-    } catch (err) {
-      console.error("Delete Credential Error:", err);
-      alert("Failed to delete credential. Please try again.");
-    }
+    const deletePromise = api.delete(`api/domain/${itemId}/`);
+
+    toast.promise(deletePromise, {
+      loading: "Deleting credential...",
+      success: () => {
+        setDeleteModalState({ isOpen: false, item: null });
+        fetchDomains();
+        return "Credential deleted successfully";
+      },
+      error: "Failed to delete credential. Please try again.",
+    });
   };
 
   const filteredDomains = useMemo(() => {
@@ -183,6 +188,7 @@ function Dashboard() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("CSV export downloaded!");
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -327,7 +333,10 @@ function Dashboard() {
                             className="icon-only-btn"
                             title="Copy Username"
                             onClick={() =>
-                              handleCopy(item.site_username_or_email)
+                              handleCopy(
+                                item.site_username_or_email,
+                                "Username",
+                              )
                             }
                           >
                             <FiCopy />
@@ -355,7 +364,9 @@ function Dashboard() {
                           <button
                             className="icon-only-btn"
                             title="Copy Password"
-                            onClick={() => handleCopy(item.site_password)}
+                            onClick={() =>
+                              handleCopy(item.site_password, "Password")
+                            }
                           >
                             <FiCopy />
                           </button>

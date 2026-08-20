@@ -8,13 +8,15 @@ import AuthLayout from "./components/auth/AuthLayout";
 import Register from "./components/auth/Register";
 import SignIn from "./components/auth/SignIn";
 import DashLayout from "./components/pages/DashLayout";
-import Notifications from "./components/pages/Notifications";
+// import Notifications from "./components/pages/Notifications";
 import Dashboard from "./components/pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route
           path="/"
@@ -33,7 +35,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="notification" element={<Notifications />} />
+            {/* <Route path="notification" element={<Notifications />} /> */}
           </Route>
         </Route>
       </Routes>

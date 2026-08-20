@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  FiX,
-  FiFileText,
-  FiCopy,
-  FiEdit,
-  FiTrash2,
-  FiSave,
-} from "react-icons/fi";
+import { FiX, FiFileText } from "react-icons/fi";
+import toast from "react-hot-toast";
 import { api } from "../../context/AuthContext";
 
 function NoteModal({
@@ -17,16 +11,13 @@ function NoteModal({
   domainId,
   onNoteUpdated,
 }) {
-  const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNote, setEditedNote] = useState(note || "");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     setEditedNote(note || "");
     setIsEditing(false);
-    setError(null);
   }, [note, isOpen]);
 
   if (!isOpen) return null;
@@ -34,45 +25,46 @@ function NoteModal({
   const handleCopy = () => {
     if (editedNote) {
       navigator.clipboard.writeText(editedNote);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast.success("Note copied to clipboard!");
     }
   };
 
   const handleSave = async () => {
     setLoading(true);
-    setError(null);
-    try {
-      await api.patch(`api/domain/${domainId}/`, {
-        note: editedNote,
-      });
-      setIsEditing(false);
-      if (onNoteUpdated) onNoteUpdated();
-    } catch (err) {
-      console.error("Failed to update note:", err);
-      setError("Failed to save changes. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    const savePromise = api.patch(`api/domain/${domainId}/`, {
+      note: editedNote,
+    });
+
+    toast
+      .promise(savePromise, {
+        loading: "Saving note...",
+        success: () => {
+          setIsEditing(false);
+          if (onNoteUpdated) onNoteUpdated();
+          return "Note updated successfully!";
+        },
+        error: "Failed to save note.",
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleDelete = async () => {
-    // if (!window.confirm("Are you sure you want to clear this note?")) return;
-
     setLoading(true);
-    setError(null);
-    try {
-      await api.patch(`api/domain/${domainId}/`, {
-        note: "",
-      });
-      if (onNoteUpdated) onNoteUpdated();
-      onClose();
-    } catch (err) {
-      console.error("Failed to delete note:", err);
-      setError("Failed to delete note. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    const deletePromise = api.patch(`api/domain/${domainId}/`, {
+      note: "",
+    });
+
+    toast
+      .promise(deletePromise, {
+        loading: "Deleting note...",
+        success: () => {
+          if (onNoteUpdated) onNoteUpdated();
+          onClose();
+          return "Note removed!";
+        },
+        error: "Failed to delete note.",
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -92,17 +84,6 @@ function NoteModal({
         </div>
 
         <div className="modal-body">
-          {error && (
-            <p
-              style={{
-                color: "#dc2626",
-                fontSize: "0.875rem",
-                marginBottom: "0.5rem",
-              }}
-            >
-              {error}
-            </p>
-          )}
           <textarea
             className="note-textarea"
             readOnly={!isEditing || loading}
@@ -126,7 +107,7 @@ function NoteModal({
                 disabled={loading}
                 style={{ color: "#dc2626", borderColor: "#fca5a5" }}
               >
-                {loading ? "Deleting..." : "Delete Note"}
+                Delete Note
               </button>
             )}
           </div>
@@ -139,7 +120,7 @@ function NoteModal({
                 onClick={handleCopy}
                 disabled={loading}
               >
-                {copied ? "Copied!" : "Copy"}
+                Copy
               </button>
             )}
 
@@ -150,7 +131,7 @@ function NoteModal({
                 onClick={handleSave}
                 disabled={loading}
               >
-                <FiSave /> {loading ? "Saving..." : "Save"}
+                Save
               </button>
             ) : (
               <button
@@ -159,7 +140,7 @@ function NoteModal({
                 onClick={() => setIsEditing(true)}
                 disabled={loading}
               >
-                <FiEdit /> Edit
+                Edit
               </button>
             )}
 

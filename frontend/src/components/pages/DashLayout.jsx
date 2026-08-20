@@ -33,10 +33,10 @@ function DashLayout() {
               <LuLayoutDashboard />
               Dashboard
             </NavLink>
-            <NavLink to="notification">
+            {/* <NavLink to="notification">
               <IoIosNotificationsOutline />
               Notifications
-            </NavLink>
+            </NavLink> */}
           </nav>
           <button
             type="button"
