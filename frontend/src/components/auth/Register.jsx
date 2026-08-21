@@ -40,10 +40,13 @@ function Register() {
     };
 
     try {
-      await api.post("auth/api/register/", userData);
+      await api.post("api/register/users/", userData);
       setSuccessMessage("Account Creation Successful.");
 
-      const signinRedirect = await api.post("auth/api/login/", signInData);
+      const signinRedirect = await api.post(
+        "api/register/api/token/",
+        signInData,
+      );
 
       login(signinRedirect.data);
 

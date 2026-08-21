@@ -1,26 +1,43 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { CiSearch, CiFilter } from "react-icons/ci";
+import { CiSearch } from "react-icons/ci";
 import {
+  FiShield,
+  FiKey,
   FiGlobe,
-  FiClock,
-  FiAlertTriangle,
   FiPlus,
   FiDownload,
   FiChevronLeft,
   FiChevronRight,
+  FiEye,
+  FiEyeOff,
+  FiCopy,
+  FiEdit,
+  FiTrash2,
+  FiFileText,
 } from "react-icons/fi";
+import toast from "react-hot-toast";
 import "../../styles/page_styles/Dashboard.css";
 import AddDomain from "./AddDomain";
-import DomainDetails from "./DomainDetails";
+import NoteModal from "./NoteModal";
+import DeleteCredentialModal from "./DeleteCredentialModal";
 import { api, useAuth } from "../../context/AuthContext";
 
 function Dashboard() {
   const { accessToken } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [registrarFilter, setRegistrarFilter] = useState("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDomain, setSelectedDomain] = useState(null);
+  const [editingDomain, setEditingDomain] = useState(null);
+  const [visiblePasswords, setVisiblePasswords] = useState({});
+  const [activeNoteModal, setActiveNoteModal] = useState({
+    isOpen: false,
+    id: null,
+    note: "",
+    siteName: "",
+  });
+  const [deleteModalState, setDeleteModalState] = useState({
+    isOpen: false,
+    item: null,
+  });
 
   const [domains, setDomains] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +57,7 @@ function Dashboard() {
     setError(null);
     try {
       let allDomains = [];
-      let nextUrl = "domain/api/";
+      let nextUrl = "api/domain/";
 
       while (nextUrl) {
         const endpoint = nextUrl.replace(/^https?:\/\/[^\/]+/, "");
@@ -57,64 +74,80 @@ function Dashboard() {
 
       setDomains(allDomains);
     } catch (err) {
-      console.error("Fetch Domains Error:", err);
-      setError("Failed to fetch domain portfolio from server.");
+      console.error("Fetch Items Error:", err);
+      setError("Failed to fetch credentials from server.");
     } finally {
       setLoading(false);
     }
   };
 
-  const getDomainStatus = (domain) => {
-    if (domain.status && domain.status !== "ACTIVE") {
-      return domain.status;
-    }
-
-    const expiryStr = domain.expiry_date || domain.expiry;
-    if (!expiryStr) return "ACTIVE";
-
-    const today = new Date();
-    const expiry = new Date(expiryStr);
-    const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return "EXPIRED";
-    if (diffDays <= 30) return "EXPIRING_SOON";
-    return "ACTIVE";
+  const togglePasswordVisibility = (id) => {
+    setVisiblePasswords((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
-  const expiringSoonCount = useMemo(
-    () => domains.filter((d) => getDomainStatus(d) === "EXPIRING_SOON").length,
-    [domains],
-  );
+  const handleCopy = (text, label = "Item") => {
+    if (text) {
+      navigator.clipboard.writeText(text);
+      toast.success(`${label} copied to clipboard!`);
+    }
+  };
 
-  const expiredCount = useMemo(
-    () => domains.filter((d) => getDomainStatus(d) === "EXPIRED").length,
-    [domains],
-  );
+  const handleOpenNote = (item) => {
+    setActiveNoteModal({
+      isOpen: true,
+      id: item.id || item.pk,
+      note: item.note || "",
+      siteName: item.site_name || "Credential Note",
+    });
+  };
 
-  const uniqueRegistrars = useMemo(
-    () => [
-      "ALL",
-      ...Array.from(new Set(domains.map((d) => d.registrar).filter(Boolean))),
-    ],
-    [domains],
-  );
+  const handleEdit = (item) => {
+    setEditingDomain(item);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (item) => {
+    setDeleteModalState({
+      isOpen: true,
+      item: item,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    const item = deleteModalState.item;
+    if (!item) return;
+
+    const itemId = item.id || item.pk;
+    const deletePromise = api.delete(`api/domain/${itemId}/`);
+
+    toast.promise(deletePromise, {
+      loading: "Deleting credential...",
+      success: () => {
+        setDeleteModalState({ isOpen: false, item: null });
+        fetchDomains();
+        return "Credential deleted successfully";
+      },
+      error: "Failed to delete credential. Please try again.",
+    });
+  };
 
   const filteredDomains = useMemo(() => {
     return domains.filter((item) => {
-      const status = getDomainStatus(item);
-      const name = item.domain_name || item.name || "";
-      const registrar = item.registrar || "";
+      const siteName = item.site_name || "";
+      const username = item.site_username_or_email || "";
+      const loginUrl = item.login_url || "";
 
-      const matchesSearch =
-        name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        registrar.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "ALL" || status === statusFilter;
-      const matchesRegistrar =
-        registrarFilter === "ALL" || registrar === registrarFilter;
-
-      return matchesSearch && matchesStatus && matchesRegistrar;
+      const term = searchTerm.toLowerCase();
+      return (
+        siteName.toLowerCase().includes(term) ||
+        username.toLowerCase().includes(term) ||
+        loginUrl.toLowerCase().includes(term)
+      );
     });
-  }, [domains, searchTerm, statusFilter, registrarFilter]);
+  }, [domains, searchTerm]);
 
   const totalPages = Math.ceil(filteredDomains.length / itemsPerPage);
 
@@ -124,20 +157,21 @@ function Dashboard() {
     }
   };
 
-  const handleAddDomainSubmit = () => {
+  const handleModalSubmit = () => {
     fetchDomains();
-    setCurrentPage(1);
+    setIsModalOpen(false);
+    setEditingDomain(null);
   };
 
   const handleExportCSV = () => {
     if (filteredDomains.length === 0) return;
 
-    const headers = ["Domain Name", "Registrar", "Expiry Date", "Status"];
+    const headers = ["Site Name", "Login URL", "Username/Email", "Notes"];
     const rows = filteredDomains.map((item) => [
-      `"${item.domain_name || item.name || ""}"`,
-      `"${item.registrar || ""}"`,
-      `"${item.expiry_date || item.expiry || ""}"`,
-      `"${getDomainStatus(item)}"`,
+      `"${item.site_name || ""}"`,
+      `"${item.login_url || ""}"`,
+      `"${item.site_username_or_email || ""}"`,
+      `"${item.note || ""}"`,
     ]);
 
     const csvContent =
@@ -149,11 +183,12 @@ function Dashboard() {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `domain_portfolio_${new Date().toISOString().slice(0, 10)}.csv`,
+      `credentials_backup_${new Date().toISOString().slice(0, 10)}.csv`,
     );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("CSV export downloaded!");
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -165,98 +200,71 @@ function Dashboard() {
       <header className="dash-header">
         <div>
           <h2>Dashboard</h2>
-          <p className="breadcrumb">Home / Dashboard</p>
+          <p className="breadcrumb">Home / Credentials Vault</p>
         </div>
-        <button className="add-btn" onClick={() => setIsModalOpen(true)}>
-          <FiPlus /> Add New Domain
+        <button
+          className="add-btn"
+          onClick={() => {
+            setEditingDomain(null);
+            setIsModalOpen(true);
+          }}
+        >
+          <FiPlus /> Add Credential
         </button>
       </header>
 
       <section className="metrics-grid">
         <div className="metric-card">
           <div className="metric-header">
-            <span className="metric-title">Total Domains</span>
+            <span className="metric-title">Total Saved Credentials</span>
+            <span className="metric-icon primary-icon">
+              <FiShield />
+            </span>
+          </div>
+          <h3 className="metric-value">{domains.length}</h3>
+          <span className="metric-sub text-positive">Encrypted & Secured</span>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-title">Active Vault Items</span>
+            <span className="metric-icon warning-icon">
+              <FiKey />
+            </span>
+          </div>
+          <h3 className="metric-value">{domains.length}</h3>
+          <span className="metric-sub text-warning">Ready to use</span>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-title">Websites Managed</span>
             <span className="metric-icon primary-icon">
               <FiGlobe />
             </span>
           </div>
-          <h3 className="metric-value">{domains.length}</h3>
-          <span className="metric-sub text-positive">Active portfolio</span>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-header">
-            <span className="metric-title">Expiring Soon (30 days)</span>
-            <span className="metric-icon warning-icon">
-              <FiClock />
-            </span>
-          </div>
-          <h3 className="metric-value">{expiringSoonCount}</h3>
-          <span className="metric-sub text-warning">Action required</span>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-header">
-            <span className="metric-title">Expired</span>
-            <span className="metric-icon danger-icon">
-              <FiAlertTriangle />
-            </span>
-          </div>
-          <h3 className="metric-value">{expiredCount}</h3>
-          <span className="metric-sub text-danger">Action required</span>
+          <h3 className="metric-value">
+            {new Set(domains.map((d) => d.site_name).filter(Boolean)).size}
+          </h3>
+          <span className="metric-sub text-positive">Unique Sites</span>
         </div>
       </section>
 
       <section className="table-container">
         <div className="table-header">
-          <h3>Domain Portfolio</h3>
+          <h3>Credentials Vault</h3>
           <div className="table-actions">
             <div className="search-box">
               <CiSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Search domains..."
+                placeholder="Search site, email, URL..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
               />
-            </div>
-
-            <div className="filter-select-wrapper">
-              <CiFilter className="filter-icon" />
-              <select
-                className="filter-select"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="ALL">All Statuses</option>
-                <option value="ACTIVE">Active</option>
-                <option value="EXPIRING_SOON">Expiring Soon</option>
-                <option value="EXPIRED">Expired</option>
-              </select>
-            </div>
-
-            <div className="filter-select-wrapper">
-              <CiFilter className="filter-icon" />
-              <select
-                className="filter-select"
-                value={registrarFilter}
-                onChange={(e) => {
-                  setRegistrarFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                {uniqueRegistrars.map((reg) => (
-                  <option key={reg} value={reg}>
-                    {reg === "ALL" ? "All Registrars" : reg}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <button
@@ -273,64 +281,133 @@ function Dashboard() {
           <table className="domain-table">
             <thead>
               <tr>
-                <th>
-                  <input type="checkbox" />
-                </th>
-                <th>Domain Name</th>
-                <th>Registrar</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
+                <th>Site Name</th>
+                <th>Login URL</th>
+                <th>Username / Email</th>
+                <th>Password</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="no-data">
-                    Loading domain portfolio...
+                  <td colSpan="5" className="no-data">
+                    Loading credential items...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="6" className="no-data">
+                  <td colSpan="5" className="no-data">
                     {error}
                   </td>
                 </tr>
               ) : currentDomains.length > 0 ? (
                 currentDomains.map((item, index) => {
-                  const statusDisplay = getDomainStatus(item);
+                  const itemId = item.id || item.pk || index;
+                  const isPasswordShown = !!visiblePasswords[itemId];
+
                   return (
-                    <tr key={item.id || item.pk || index}>
-                      <td>{Math.floor(Math.random(1, 1000) * 1000)}</td>
-                      <td className="domain-name">
-                        {item.domain_name || item.name}
-                      </td>
-                      <td>{item.registrar}</td>
-                      <td>{item.expiry_date || item.expiry}</td>
+                    <tr key={itemId}>
+                      <td className="domain-name">{item.site_name}</td>
                       <td>
-                        <span
-                          className={`status-pill ${statusDisplay
-                            .toLowerCase()
-                            .replace(/_/g, "-")}`}
-                        >
-                          {statusDisplay.replace(/_/g, " ")}
-                        </span>
+                        {item.login_url ? (
+                          <a
+                            href={
+                              item.login_url.startsWith("http")
+                                ? item.login_url
+                                : `https://${item.login_url}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {item.login_url}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
                       </td>
                       <td>
-                        <button
-                          className="manage-btn"
-                          onClick={() => setSelectedDomain(item)}
-                        >
-                          Manage
-                        </button>
+                        <div className="cell-content">
+                          <span>{item.site_username_or_email}</span>
+                          <button
+                            className="icon-only-btn"
+                            title="Copy Username"
+                            onClick={() =>
+                              handleCopy(
+                                item.site_username_or_email,
+                                "Username",
+                              )
+                            }
+                          >
+                            <FiCopy />
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="cell-content">
+                          <span style={{ fontFamily: "monospace" }}>
+                            {isPasswordShown
+                              ? item.site_password
+                              : "••••••••••••"}
+                          </span>
+                          <button
+                            className="icon-only-btn"
+                            title={
+                              isPasswordShown
+                                ? "Hide Password"
+                                : "Show Password"
+                            }
+                            onClick={() => togglePasswordVisibility(itemId)}
+                          >
+                            {isPasswordShown ? <FiEyeOff /> : <FiEye />}
+                          </button>
+                          <button
+                            className="icon-only-btn"
+                            title="Copy Password"
+                            onClick={() =>
+                              handleCopy(item.site_password, "Password")
+                            }
+                          >
+                            <FiCopy />
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="action-buttons-wrapper">
+                          <button
+                            className="icon-only-btn"
+                            title={item.note ? "View / Edit Note" : "Add Note"}
+                            onClick={() => handleOpenNote(item)}
+                          >
+                            <FiFileText
+                              style={{
+                                color: item.note ? "#1a2e65" : "#94a3b8",
+                              }}
+                            />
+                          </button>
+                          <button
+                            className="icon-only-btn"
+                            title="Edit Credential"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <FiEdit />
+                          </button>
+                          <button
+                            className="icon-only-btn delete-btn"
+                            title="Delete Credential"
+                            onClick={() => handleDeleteClick(item)}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" className="no-data">
-                    No domains found.
+                  <td colSpan="5" className="no-data">
+                    No matching credentials found.
                   </td>
                 </tr>
               )}
@@ -382,16 +459,38 @@ function Dashboard() {
         </div>
       </section>
 
+      {/* Modals */}
       <AddDomain
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAddDomain={handleAddDomainSubmit}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingDomain(null);
+        }}
+        onAddDomain={handleModalSubmit}
+        domainToEdit={editingDomain}
       />
 
-      <DomainDetails
-        isOpen={!!selectedDomain}
-        onClose={() => setSelectedDomain(null)}
-        domain={selectedDomain}
+      <NoteModal
+        isOpen={activeNoteModal.isOpen}
+        onClose={() =>
+          setActiveNoteModal({
+            isOpen: false,
+            id: null,
+            note: "",
+            siteName: "",
+          })
+        }
+        domainId={activeNoteModal.id}
+        note={activeNoteModal.note}
+        siteName={activeNoteModal.siteName}
+        onNoteUpdated={fetchDomains}
+      />
+
+      <DeleteCredentialModal
+        isOpen={deleteModalState.isOpen}
+        onClose={() => setDeleteModalState({ isOpen: false, item: null })}
+        onConfirm={handleConfirmDelete}
+        siteName={deleteModalState.item?.site_name || ""}
       />
     </div>
   );

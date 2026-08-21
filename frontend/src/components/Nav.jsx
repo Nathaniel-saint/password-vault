@@ -9,7 +9,7 @@ function Nav() {
       <nav className="nav-bar">
         <Link to="/" className="img-logo">
           <img src={logo} alt="logo" className="logo" />
-          <h3 className="name">Domain Guard</h3>
+          <h3 className="name">VAULt</h3>
         </Link>
         <nav className="nav-links">
           <Link className="s-in" to="/signin">

@@ -20,7 +20,7 @@ function SignIn() {
     setError(null);
 
     try {
-      const response = await api.post("auth/api/login/", {
+      const response = await api.post("api/register/api/token/", {
         email: form.email,
         password: form.password,
       });
